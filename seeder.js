@@ -1,6 +1,6 @@
 const User = require("./models/users");
 const Task = require("./models/task");
-const Submission = require("./models/Submission");
+const Submission = require("./models/submission");
 
 const seedTrainer = async () => {
   try {
