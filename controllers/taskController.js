@@ -1,43 +1,46 @@
 const Task = require('../models/task');
+exports.createTask = async (req, res) => {
+  try {
+    const { title, description, deadline, assignedTo } = req.body;
 
-export const createTask = async (req, res) => {
-    try {
-        const { 
-            title,
-            description, 
-            deadline, 
-            assignedTo
-         } = req.body;
-        const task = await Task.create({
-            title,
-            description,
-            deadline,
-            assignedTo,
-            createdBy: req.user._id
-        });
-        res.status(201).json(task);
-    } catch (error) {
-        res.status(500).json({ message: 'Server error' });
-    }
+    const task = await Task.create({
+      title,
+      description,
+      deadline,
+      assignedTo,
+      createdBy: req.user._id,
+    });
+
+    res.status(201).json(task);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
 };
 //get all tasks
-export const getTasks = async (req, res) => {
-    try {
-        let tasks;
-        if (req.user.role === 'trainer') {
-            tasks = await Task.find().populate('assignedTo', 'name email');
-        } else {
-            tasks = await Task.find({ assignedTo: req.user._id });
-        }
-        res.status(200).json(tasks);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
+exports.getTasks = async (req, res) => {
+  try {
+    let tasks;
+
+    if (req.user.role === "trainer") {
+      tasks = await Task.find().populate("assignedTo", "name email");
+    } else {
+      tasks = await Task.find({
+        assignedTo: req.user._id,
+      }).populate("assignedTo", "name email");
     }
 
+    res.json(tasks);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
 };
 
 //update task status
-export const updateTaskStatus = async (req, res) => {
+exports.updateTask = async (req, res) => {
     try {
         
 
@@ -60,7 +63,7 @@ export const updateTaskStatus = async (req, res) => {
 };
 
 //delete task
-export const deleteTask = async (req, res) => {
+exports.deleteTask = async (req, res) => {
     try {
         const task = await Task.findById(req.params.id);
         if (!task) {
